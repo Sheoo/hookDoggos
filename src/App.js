@@ -1,52 +1,41 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      breeds: [],
-      selection: ""
-    };
-  }
+const App = () => {
+  const [breeds, setBreeds] = useState([]);
+  const [selection, setSelection] = useState("");
 
-  componentDidMount() {
+  useEffect(() => {
     fetch("https://dog.ceo/api/breeds/list/all")
       .then(res => res.json())
-      .then(data => this.setState({ breeds: Object.keys(data.message) }));
-  }
+      .then(data => setBreeds(Object.keys(data.message)));
+  });
 
-  handleSelection = breed =>
+  const handleSelection = breed =>
     fetch(`https://dog.ceo/api/breed/${breed}/images/random`)
       .then(res => res.json())
-      .then(data => this.setState({ selection: data.message }));
+      .then(data => setSelection(data.message));
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <div style={{ height: "500px" }}>
-            {this.state.selection ? (
-              <img
-                src={this.state.selection}
-                alt=""
-                style={{ width: "auto", height: "100%" }}
-              />
-            ) : (
-              <p>Choose a dog</p>
-            )}
-          </div>
-          <div style={{ display: "inline" }}>
-            {this.state.breeds.map((element, i) => (
-              <button key={i} onClick={() => this.handleSelection(element)}>
-                {element}
-              </button>
-            ))}
-          </div>
-        </header>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="App">
+      <header className="App-header">
+        <div style={{ height: "500px" }}>
+          {selection ? (
+            <img
+              src={selection}
+              alt=""
+              style={{ width: "auto", height: "100%" }}
+            />
+          ) : (
+            <p>Choose a dog</p>
+          )}
+        </div>
+        {React.Children.map(breeds, element => (
+          <button style={{ display: "inline" }} onClick={() => handleSelection(element)}>{element}</button>
+        ))}
+      </header>
+    </div>
+  );
+};
 
 export default App;
